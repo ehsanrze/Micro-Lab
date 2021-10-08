@@ -17,8 +17,12 @@
 # Ignore all local history of files
 .history
 .ionide
+
+# Compiled c codes
 *.elf
 *.o
-
 Makefile
+
+# Proteus
+*.pdsbak
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
