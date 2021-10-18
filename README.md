@@ -7,6 +7,7 @@
 
 
 ## Experiment 2
- - [Question one project - blinking ports](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/Q1_Blinking_Ports)
- - [Question two project - blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/Q2_Blinking_LEDs)
- - [Question three project - sequential blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/Q3_sequential_blinking_leds)
+ - [Answers - contains Question 1 to 5 answers](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-2/Answers.pdf)
+ - [Question one project - blinking ports](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q1_blinking_ports)
+ - [Question two project - blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q2_blinking_leds)
+ - [Question three project - sequential blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q3_sequential_blinking_leds)
