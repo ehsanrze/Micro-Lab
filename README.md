@@ -11,3 +11,8 @@
  - [Question one project - blinking ports](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q1_blinking_ports)
  - [Question two project - blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q2_blinking_leds)
  - [Question three project - sequential blinking leds](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-2/q3_sequential_blinking_leds)
+
+## Experiment 3
+ - [Answers - contains Question 1 to 2 answers](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-3/Answers.pdf)
+ - [Question one project - one digit timer](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-3/q1_part1_one_digit_timer)
+ - [Question two project - four digit timer](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-3/q1_part2_four_digit_timer)
