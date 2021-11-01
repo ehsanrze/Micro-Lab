@@ -3,7 +3,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-volatile uint8_t timer2_overflow = 0;
+volatile uint8_t timer1_overflow = 0;
 int seconds = 0;
 int minutes = 0;
 int hours = 0;
@@ -11,23 +11,23 @@ int hours = 0;
 // cast numbers to character
 char cast_numbers[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-void initial_timer_2()
+void initial_timer_1()
 {
-    // prescaler = 256
-    TCCR2 |= _BV(CS22) | _BV(CS21);
+    // prescaler = 8
+    TCCR1B |= _BV(CS11);
 
     // counter set to 0
-    TCNT2 = 0;
+    TCNT1 = 0;
 
     // enable overflow interrupt
-    TIMSK |= _BV(TOIE2);
+    TIMSK |= _BV(TOIE1);
 
-    timer2_overflow = 0;
+    timer1_overflow = 0;
 }
 
-ISR(TIMER2_OVF_vect)
+ISR(TIMER1_OVF_vect)
 {
-    timer2_overflow++;
+    timer1_overflow++;
 }
 
 // this function config LCD
@@ -146,41 +146,41 @@ int main()
 
     reset_lcd();
     show_clock();
-    initial_timer_2();
+    initial_timer_1();
     sei();
 
     setup_alarm();
     while (1)
     {
-        if (timer2_overflow >= 122)
+        if (timer1_overflow >= 15)
         {
-            if (TCNT2 >= 18)
+            if (TCNT1 >= 16960)
             {
-                if (seconds<0 & minutes> 0)
+                if (seconds >= 1)
+                {
+                    seconds--;
+                }
+                if (seconds <= 0 && minutes >= 1)
                 {
                     seconds = 59;
                     minutes--;
                 }
-                else
-                {
-                    seconds--;
-                }
-
-                if (minutes < 0 && hours > 0)
+                if (seconds <= 0 && minutes <= 0 && hours >= 1)
                 {
                     minutes = 59;
+                    seconds = 59;
                     hours--;
                 }
-
                 if (hours <= 0 && minutes <= 0 && seconds <= 0)
                 {
                     finished_alarm();
                     show_clock();
                     setup_alarm();
                 }
+
                 show_clock();
-                TCNT2 = 0;           // reset counter
-                timer2_overflow = 0; // reset overflow counter
+                TCNT1 = 0;           // reset counter
+                timer1_overflow = 0; // reset overflow counter
             }
         }
     }
