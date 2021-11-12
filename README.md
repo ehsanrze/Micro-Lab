@@ -22,3 +22,10 @@
  - [Question one part one - show a string on lcd](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-4/part1_show_string_on_lcd)
  - [Question one part two - digital clock](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-4/part2_digital_clock)
  - [Question one part three - digital alarm](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-4/part3_digital_alarm)
+
+## Experiment 5
+ - [Answers - contains Question 1 part 1 to 3](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-5/Answers.pdf)
+ - [Question one part one - stepper motor](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-5/part1_stepper_motor)
+ - [Question one part two - motor with push button to change rotate direction](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-5/part2_recursive_motor)
+ - [Question one part three - motor with push button to auto rotate direction](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-5/part3_auto_recursive)
+
