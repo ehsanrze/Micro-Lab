@@ -29,3 +29,7 @@
  - [Question one part two - motor with push button to change rotate direction](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-5/part2_recursive_motor)
  - [Question one part three - motor with push button to auto rotate direction](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-5/part3_auto_recursive)
 
+## Experiment 6
+ - [Answers - contains Question 1 part 1 to 2](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-6/Answers.pdf)
+ - [Question one part one - show temp on lcd](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-6/part1_analog_temp)
+ - [Question one part two - cooling machine](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-6/part2_temp_motor)
