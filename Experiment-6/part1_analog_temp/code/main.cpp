@@ -9,20 +9,20 @@ int adc_result;
 void adc_init()
 {
     // Enable ADC
-    ADCSRA = (1 << ADEN);
+    ADCSRA = _BV(ADEN);
 }
 
 int adc_read(int channel)
 {
     // select channel 0-7
-    channel &= 0b00000111;
+    channel &= _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
     ADMUX = (ADMUX & 0xF8) | channel;
 
     // start conversion
-    ADCSRA |= (1 << ADSC);
+    ADCSRA |= _BV(ADSC);
 
     // wait for conversion to complete
-    while (ADCSRA & (1 << ADSC));
+    while (ADCSRA & _BV(ADSC));
 
     return ADC;
 }

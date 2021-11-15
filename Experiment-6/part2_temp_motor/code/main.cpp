@@ -12,25 +12,25 @@ int steps[] = {0x09, 0x0A, 0x06, 0x05};
 int step_index = 0;
 volatile uint32_t timer0_overflows = 0;
 bool motor_status = false;
-int temp = 25;  // setup temperature
+int temp = 25; // setup temperature
 
 void adc_init()
 {
     // Enable ADC
-    ADCSRA = (1 << ADEN);
+    ADCSRA = _BV(ADEN);
 }
 
 int adc_read(int channel)
 {
     // select channel 0-7
-    channel &= 0b00000111;
+    channel &= _BV(MUX2) | _BV(MUX1) | _BV(MUX0);
     ADMUX = (ADMUX & 0xF8) | channel;
 
     // start conversion
-    ADCSRA |= (1 << ADSC);
+    ADCSRA |= _BV(ADSC);
 
     // wait for conversion to complete
-    while (ADCSRA & (1 << ADSC))
+    while (ADCSRA & _BV(ADSC))
         ;
 
     return ADC;
@@ -43,7 +43,6 @@ void lcd_config_cmd(char config)
     _delay_ms(10);
     PORTD = 0x00;
 }
-
 
 void reset_lcd()
 {
@@ -64,7 +63,6 @@ void show_on_lcd(char data[])
         PORTD = 0x04;
     }
 }
-
 
 void initial_timer0()
 {
