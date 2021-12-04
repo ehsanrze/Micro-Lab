@@ -16,6 +16,7 @@ int step_index = 0;
 volatile uint32_t timer0_overflows = 0;
 bool motor_status = false;
 int temp = 25; // setup temperature
+int motor_cycle = 0;
 
 void adc_init()
 {
@@ -69,7 +70,7 @@ void uart_init(void)
 {
     UBRRH = (BAUDRATE >> 8);
     UBRRL = BAUDRATE;                                    //set baud rate
-    UCSRB |= (1 << TXEN) | (1 << RXEN);                  //enable receiver and transmitter
+    UCSRB |= (1 << TXEN) | _BV(RXEN) | (1 << RXCIE);                 //enable receiver and transmitter
     UCSRC |= (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1); // 8bit data format
 }
 
@@ -79,6 +80,12 @@ void uart_transmit(unsigned int data)
     while (!(UCSRA & (1 << UDRE)))
         ;       // wait while register is free
     UDR = data; // load data in the register
+}
+
+ISR(USART_RXC_vect)
+{
+    motor_cycle = UDR * 4;
+    motor_status = true;
 }
 
 int main()
@@ -94,12 +101,11 @@ int main()
 
     while (1)
     {
-
         if (adc_result != adc_read(0))
         {
             // read adc form PA0
             adc_result = adc_read(0);
-            adc_result >= temp ? motor_status = true : motor_status = false;
+            uart_transmit(adc_result);
         }
 
         // timer with 0.5s
@@ -107,11 +113,11 @@ int main()
         {
             if (TCNT0 >= 9)
             {
-                uart_transmit(adc_result);
                 PORTB = steps[step_index];
                 (step_index >= 3) ? step_index = 0 : step_index++;
                 TCNT0 = 0;
                 timer0_overflows = 0;
+                (motor_cycle == 1) ? motor_status = false : motor_cycle--;
             }
         }
     }
