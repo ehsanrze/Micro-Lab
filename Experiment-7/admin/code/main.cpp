@@ -2,10 +2,11 @@
 #include <util/delay.h>
 #include <string.h>
 #include <stdlib.h>
+#include <avr/interrupt.h>
 
 #define LCD_Data PORTC
-#define LCD_Config PORTD
-#define NOTIF_PORT PORTB
+#define LCD_Config PORTB
+#define NOTIF_PORT PORTD
 
 #define GREEN_LIGHT 4
 #define RED_LIGHT 5
@@ -14,9 +15,15 @@
 #define KEYPAD_DDR DDRA
 #define KEYPAD_PIN PINA
 
+#define BAUD 9600                              // define baud
+#define BAUDRATE ((F_CPU) / (BAUD * 16UL) - 1) // set baudrate value for UBRR
+
 char keypad[12] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'};
 char username[10] = "123";
 char password[10] = "123";
+char temp[10];
+volatile uint32_t timer0_overflows = 0;
+
 void lcd_config_cmd(char config)
 {
     LCD_Data = config;
@@ -119,8 +126,8 @@ void notification(int status)
 void home()
 {
     reset_lcd();
-    show_on_lcd("User ID: ");
-    show_on_lcd(username);
+    show_on_lcd("Temp is: ");
+    show_on_lcd(temp);
     go_to_line_lcd(2);
     show_on_lcd("Date: 2021-09-10");
     go_to_line_lcd(3);
@@ -200,15 +207,68 @@ void login()
     }
 }
 
+// function to initialize UART
+void uart_init(void)
+{
+    UBRRH = (BAUDRATE >> 8);
+    UBRRL = BAUDRATE;                                    //set baud rate
+    UCSRB |= (1 << TXEN) | (1 << RXEN);                  //enable receiver and transmitter
+    UCSRC |= (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1); // 8bit data format
+}
+
+// // function to send data - NOT REQUIRED FOR THIS PROGRAM IMPLEMENTATION
+// void uart_transmit (unsigned char data)
+// {
+//     while (!( UCSRA & (1<<UDRE)));            // wait while register is free
+//     UDR = data;                             // load data in the register
+// }
+
+// function to receive data
+unsigned int uart_recieve(void)
+{
+    while (!(UCSRA) & (1 << RXC))
+        ;       // wait while data is being received
+    return UDR; // return 8-bit data
+}
+
+void initial_timer0()
+{
+    // prescaler = 256
+    TCCR0 |= _BV(CS02);
+
+    TCNT0 = 0;
+
+    TIMSK |= _BV(TOIE0);
+
+    timer0_overflows = 0;
+}
+
+ISR(TIMER0_OVF_vect)
+{
+    timer0_overflows++;
+}
+
 int main()
 {
     DDRC = 0xFF;
     DDRD = 0xFF;
     DDRB = 0xFF;
+
+    initial_timer0();
+    sei();
+    uart_init();
     reset_lcd();
     login();
 
     while (1)
     {
+        if (timer0_overflows >= 61)
+        {
+            if (TCNT0 >= 9)
+            {
+                itoa(uart_recieve(), temp, 10);
+                home();
+            }
+        }
     }
 }
