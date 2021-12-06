@@ -33,3 +33,9 @@
  - [Answers - contains Question 1 part 1 to 2](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-6/Answers.pdf)
  - [Question one part one - show temp on lcd](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-6/part1_analog_temp)
  - [Question one part two - cooling machine](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-6/part2_cooling_machine)
+
+## Experiment 7
+ - [Answers](https://github.com/ehsanrze/Micro-Lab/blob/main/Experiment-7/Answers.pdf)
+ - [Admin Microcontroller](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-7/admin)
+ - [Operation Microcontroller](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-7/operation)
+ - [Result of experiment](https://github.com/ehsanrze/Micro-Lab/tree/main/Experiment-7/results)
