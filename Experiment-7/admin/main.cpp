@@ -21,20 +21,20 @@
 char keypad[13] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#', '-'};
 char username[10] = "123";
 char password[10] = "123";
-char temp[10];
-char year[10] = "21", month[10] = "00", day[10] = "01";
+char temp[10] = "-";
+char year[10] = "21", month[10] = "10", day[10] = "12";
 int seconds = 0;
 int minutes = 0;
 int hours = 0;
 char cast_numbers[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 volatile uint32_t timer0_overflows = 0;
 
-// function to send data - NOT REQUIRED FOR THIS PROGRAM IMPLEMENTATION
+// send data with UART
 void uart_transmit(unsigned int data)
 {
     while (!(UCSRA & (1 << UDRE)))
-        ;       // wait while register is free
-    UDR = data; // load data in the register
+        ;
+    UDR = data;
 }
 
 void lcd_config_cmd(char config)
@@ -94,7 +94,7 @@ void go_to_line_lcd(int line_number)
     }
 }
 
-uint8_t GetKeyPressed()
+uint8_t get_key_pressed()
 {
     uint8_t r, c;
 
@@ -115,27 +115,27 @@ uint8_t GetKeyPressed()
     return 12;
 }
 
-int get_number()
+void get_number(char* data)
 {
+    char temp_data[10] = "";
     char key = '-';
-    int data = 0;
-    int i = 1;
+    int i = 0;
     while (1)
     {
         _delay_ms(200);
-        key = keypad[GetKeyPressed()];
+        key = keypad[get_key_pressed()];
         if (key == '*' || key == '#')
         {
             break;
         }
         if (key != '-')
         {
-            data += data + (key - '0') * i;
+            temp_data[i] = key;
             show_on_lcd(key);
+            i++;
         }
     }
-
-    return data;
+    strncpy(data, temp_data, 10);
 }
 
 void notification(int status)
@@ -153,6 +153,16 @@ void notification(int status)
     default:
         break;
     }
+}
+
+void show_date()
+{
+    show_on_lcd("20");
+    show_on_lcd(year);
+    show_on_lcd('-');
+    show_on_lcd(month);
+    show_on_lcd('-');
+    show_on_lcd(day);
 }
 
 void show_clock()
@@ -174,17 +184,13 @@ void home()
     show_on_lcd("Temp is: ");
     show_on_lcd(temp);
     go_to_line_lcd(2);
-    show_on_lcd("20");
-    show_on_lcd(year);
-    show_on_lcd('-');
-    show_on_lcd(month);
-    show_on_lcd('-');
-    show_on_lcd(day);
+    show_on_lcd("Date: ");
+    show_date();
     go_to_line_lcd(3);
     show_on_lcd("Time: ");
     show_clock();
     go_to_line_lcd(4);
-    show_on_lcd("Admin: Press *");
+    show_on_lcd("Admin: Press * ");
 }
 
 void login()
@@ -199,7 +205,7 @@ void login()
     while (1)
     {
         _delay_ms(200);
-        key = keypad[GetKeyPressed()];
+        key = keypad[get_key_pressed()];
         if (key == '*' || key == '#')
         {
             break;
@@ -222,7 +228,7 @@ void login()
         while (1)
         {
             _delay_ms(200);
-            key = keypad[GetKeyPressed()];
+            key = keypad[get_key_pressed()];
             if (key == '*' || key == '#')
             {
                 break;
@@ -259,56 +265,78 @@ void login()
     }
 }
 
-
+// setup counter of stepper motor
 void set_stepper_motor()
 {
     reset_lcd();
     char key = '-';
     int i = 1;
-    int stepper_motor = 0;
+    char input_stepper_motor[10];
+    int stepper_motor;
     show_on_lcd("Setup stepper motor ");
-    while (1)
-    {
-        _delay_ms(200);
-        key = keypad[GetKeyPressed()];
-        if (key == '*' || key == '#')
-        {
-            break;
-        }
-        if (key != '-')
-        {
-            stepper_motor += (key - '0') * i;
-            i *= 10;
-            show_on_lcd(key);
-        }
-    }
+    go_to_line_lcd(2);
+    get_number(input_stepper_motor);
+    stepper_motor = atoi(input_stepper_motor);
     uart_transmit(stepper_motor);
 }
 
+// setup date of system
 void set_date()
 {
     reset_lcd();
     show_on_lcd("Year, Month, Day: ");
     go_to_line_lcd(2);
-    itoa(get_number(), year, 10);
+    get_number(year);
     go_to_line_lcd(3);
-    itoa(get_number(), month, 10);
+    get_number(month);
     go_to_line_lcd(4);
-    itoa(get_number(), day, 10);
+    get_number(day);
     home();
 }
 
+// setup time of system
 void set_time()
 {
+    char input_hours[10], input_minutes[10], input_seconds[10];
     reset_lcd();
-    show_on_lcd("Hour, Minutes, Seconds: ");
+    show_on_lcd("Hour,Minute,Second:");
     go_to_line_lcd(2);
-    hours = get_number();
+    get_number(input_hours);
+    hours = atoi(input_hours);
     go_to_line_lcd(3);
-    minutes = get_number();
+    get_number(input_minutes);
+    minutes = atoi(input_minutes);
     go_to_line_lcd(4);
-    seconds = get_number();
+    get_number(input_seconds);
+    seconds = atoi(input_seconds);
     home();
+}
+
+void counter()
+{
+    if (seconds >= 59)
+    {
+        seconds = 0;
+        minutes++;
+    }
+    else
+    {
+        seconds++;
+    }
+
+    if (minutes >= 59)
+    {
+        minutes = 0;
+        hours++;
+    }
+
+    if (hours >= 12)
+    {
+        hours = 0;
+    }
+    home();
+    TCNT0 = 0;
+    timer0_overflows = 0;
 }
 
 void admin()
@@ -321,10 +349,10 @@ void admin()
     go_to_line_lcd(3);
     show_on_lcd("3- Set Stepper motor");
     go_to_line_lcd(4);
-    show_on_lcd("4- back");
+    show_on_lcd("4- Back");
     while (key == '-')
     {
-        key = keypad[GetKeyPressed()];
+        key = keypad[get_key_pressed()];
     }
     switch (key)
     {
@@ -348,7 +376,6 @@ void admin()
 
 void initial_timer0()
 {
-    // prescaler = 256
     TCCR0 |= _BV(CS02);
 
     TCNT0 = 0;
@@ -363,15 +390,16 @@ ISR(TIMER0_OVF_vect)
     timer0_overflows++;
 }
 
-// function to initialize UART
+// Initial UART
 void uart_init(void)
 {
     UBRRH = (BAUDRATE >> 8);
-    UBRRL = BAUDRATE;                                    //set baud rate
-    UCSRB |= (1 << TXEN) | _BV(RXEN) | (1 << RXCIE);     //enable receiver and transmitter
+    UBRRL = BAUDRATE;
+    UCSRB |= (1 << TXEN) | _BV(RXEN) | (1 << RXCIE);     //enable receiver (interrupt) and transmitter
     UCSRC |= (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1); // 8bit data format
 }
 
+// Interrupt for receiver
 ISR(USART_RXC_vect)
 {
     itoa(UDR, temp, 10);
@@ -392,7 +420,7 @@ int main()
 
     while (1)
     {
-        if (GetKeyPressed() != 12)
+        if (get_key_pressed() != 12)
         {
             admin();
         }
@@ -400,29 +428,7 @@ int main()
         {
             if (TCNT0 >= 9)
             {
-                if (seconds >= 59)
-                {
-                    seconds = 0;
-                    minutes++;
-                }
-                else
-                {
-                    seconds++;
-                }
-
-                if (minutes >= 59)
-                {
-                    minutes = 0;
-                    hours++;
-                }
-
-                if (hours >= 12)
-                {
-                    hours = 0;
-                }
-                home();
-                TCNT0 = 0;            // reset counter
-                timer0_overflows = 0; // reset overflow counter
+                counter();
             }
         }
     }
